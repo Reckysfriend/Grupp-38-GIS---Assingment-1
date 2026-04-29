@@ -1,6 +1,6 @@
 // ---------------------------------------- Builds Map ---------------------------------------- //
 
-var map = L.map("map").setView([60.61713023811373, 15.597447894438337], 13);
+var map = L.map("map").setView([62.226996, 16.21582], 5);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19,
@@ -20,13 +20,25 @@ var polygon = L.polygon([
 ]).bindPopup(
   `<h1>Houses in Falun</h1><p> Each location Linus has lived in Falun </p><img src="/static/falunAir.jpg" width="500">`,
 );
-
 var line = L.polygon([
   [60.606425, 15.629591],
   [60.604342, 15.64179],
 ]).bindPopup(
   `<h1>Line between the bar and Max</h1><img src="/static/maxFalun.jpg" width="500">`,
 );
+function toggleMarker() {
+  map.flyTo([60.616944, 15.597239], 16);
+  toggleLayer(marker);
+}
+function togglePolygon() {
+  map.flyTo([60.609805, 15.621958], 14);
+  toggleLayer(polygon);
+}
+function toggleLine() {
+  map.flyTo([60.605098, 15.636281], 17);
+  toggleLayer(line);
+}
+
 var popupCords = L.popup();
 
 // ---------------------------------------- Task 2 ---------------------------------------- //
@@ -37,7 +49,8 @@ const task2Location = [
     lat: 60.60437388360507,
     lng: 15.641613826911803,
     location: "Tullkammaregatan 8, 791 31 Falun",
-    description: "...",
+    description:
+      "Max Burgers är en svensk snabbmatskedja med hamburgare (kött eller kyckling), vegetariska alternativ och ett varierat sortement av tillbehör (pommes, lökringar, dip m.m). Det erbjuds ofta både drive-thru, digitala beställnings alternativ, samt sittplatser inuti resturangen.",
     img: "/static/maxFalun.jpg",
   },
   {
@@ -46,7 +59,8 @@ const task2Location = [
     lat: 60.609183123862806,
     lng: 15.656669219458408,
     location: "Bataljonsvägen 5, 791 40 Falun",
-    description: "...",
+    description:
+      "McDonald’s är en internationell snabbmatskedja som serverar hamburgare, kycklingprodukter och ett brett utbud av tillbehör som pommes frites, nuggets och desserter. Restaurangerna erbjuder ofta både drive‑thru, digitala beställningsskärmar och sittplatser inomhus.",
     img: "/static/mcdonaldsFalun.jpg",
   },
   {
@@ -55,7 +69,8 @@ const task2Location = [
     lat: 60.60684121356442,
     lng: 15.62732396279977,
     location: "Östra Hamngatan 16, 18, 791 36 Falun",
-    description: "...",
+    description:
+      "Subway är en enkel snabbmats kedja med smörgåsar med valrfitt innehåll och sallder som serveras över disk. Det finns en bred variation av pålägg som kykling, kalkon, skinka etc samt allt från sallad, tomater samt mera.Du kan antingen göra den helt egna macka med behåll som må vara unikt och gott för dig själv eller beställa färdig ställda makor som Subway själva har lagt ihop. Priset kan ligga från cirka 75kr up till 200kr beroende på längd, mängd pålägg samt ytterligare erbjudander som kakor, chips etc.",
     img: "/static/subwayFalun.jpg",
   },
   {
@@ -64,7 +79,8 @@ const task2Location = [
     lat: 60.605956029510445,
     lng: 15.633115313816822,
     location: "Åsgatan 25, 791 71 Falun",
-    description: "...",
+    description:
+      "En hamburgar restaurang med fokus på svenska råvaror med rötter i Norrland och inspiration från New York. Det finns ett bra urval av olika smashburgers men för de som inte är intresserade i nötkött finns det även ett stort urval av chicken burgers och chicken nuggets. Som vanligt för många hamburgare restauranger kan du såklart få pommes, lökringar, chili cheese och mozarella sticks till maten samt dryck ingår i många menyer.",
     img: "/static/bastardBurgerFalun.jpg",
   },
   {
@@ -73,7 +89,8 @@ const task2Location = [
     lat: 60.60635920288443,
     lng: 15.63291447234441,
     location: "Åsgatan 18, 791 71 Falun",
-    description: "...",
+    description:
+      "En japansk restaurang med stor bredd på olika rätter som Sushi, Norimaki. Samt olika små och varmrätter. Det finns även olika val för vegetariska alternativ samt efterätter. Man kan även om man är större sällskap på 6 eller fler kan man prova deras Teppanayaki som är en form av Japansk matlagning som grillas på speciell järnplatta.",
     img: "/static/tairyoFalun.jfif",
   },
 ];
@@ -85,21 +102,23 @@ function markersPointOfIntresst() {
       document.getElementById("sidebar").classList.remove("hidden");
       document.getElementById("sidebar").innerHTML =
         `<img src =${location.img} width="300" height="200">
-      <h3>${location.name}</h3>
-      <p>${location.type}</p>
-      <p>${location.location}</p>
-      <p>${location.description}</p>`;
+      <h3 class = "text-center decoration-double font-bold underline top-0">${location.name}</h3>
+      <p class = "font-bold">${location.type}</p>
+      <p class = "italic">${location.location}</p>
+      <hr class="border-dotted border-gray-400 my-4">
+      <p class = "italic">${location.description}</p>`;
     });
     markersPointOfIntresstArray.push(marker);
   });
 }
 
 function task2Handler() {
+  map.flyTo([60.607404, 15.645368], 16);
   if (markersPointOfIntresstArray.length === 0) {
     markersPointOfIntresst();
   }
   markersPointOfIntresstArray.forEach(function (marker) {
-    toggleMarker(marker);
+    toggleLayer(marker);
   });
 }
 
@@ -126,12 +145,14 @@ function addGeoJsonData(data) {
   }
 }
 function toggleSupermarkets() {
+  map.flyTo([59.803397, 17.569885], 9);
   if (supermarketLayer) {
-    toggleMarker(supermarketLayer);
+    toggleLayer(supermarketLayer);
     supermarketVisible = !supermarketVisible;
   }
 }
 function toggleBuffer() {
+  map.flyTo([59.626103, 17.15395], 13);
   if (supermarketVisible && supermarketData) {
     if (!buffersVisible) {
       supermarketData.features.forEach(function (feature) {
@@ -219,6 +240,7 @@ async function fetchFuelGeoJson(path) {
 }
 var markers = L.markerClusterGroup();
 function toggleMarkerClusterGroup() {
+  map.flyTo([59.300536, 18.043851], 10);
   if (!clusterVisible) {
     fuelData.features.forEach(function (feature) {
       var lng = feature.geometry.coordinates[0];
@@ -237,6 +259,7 @@ function toggleMarkerClusterGroup() {
 donutCluster = null;
 var donutVisible = false;
 function toggleClusterGroup() {
+  map.flyTo([59.300536, 18.043851], 10);
   if (!donutVisible && donutCluster) {
     fuelData.features.forEach(function (feature) {
       var lng = feature.geometry.coordinates[0];
@@ -288,7 +311,7 @@ function toggleSidebar() {
   taskbar.classList.toggle("translate-x-full");
   taskbar.classList.toggle("translate-x-0");
 }
-function toggleMarker(layer) {
+function toggleLayer(layer) {
   if (map.hasLayer(layer)) {
     map.removeLayer(layer);
   } else {
@@ -297,25 +320,39 @@ function toggleMarker(layer) {
 }
 function buildDefaultView() {
   taskbar.innerHTML = `        
-  <button class="absolute -left-8 top-1/2 z-[2000]" onClick="toggleSidebar()"><img id="sidebarImg" src="/static/hide-sidepanel.png"/></button>
-  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask1()">Task 1</button>
-  <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask2()">Task 2</button>
-  <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask3()">Task 3</button>
-  <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask4()">Task 4</button>
-  <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask5()">Task 5</button>`;
+  <button class="absolute -left-5 top-0 z-[2000]" onClick="toggleSidebar()"><img id="sidebarImg" src="/static/hide-sidepanel.png"/></button>
+  <button class="w-[90%] bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-full" onclick="buildTask1()">Task 1</button>
+  <button class="w-[90%] bg-red-500 hover:bg-red-700 text-black font-bold py-2 px-4 rounded-full" onclick="buildTask2()">Task 2</button>
+  <button class="w-[90%] bg-yellow-500 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded-full" onclick="buildTask3()">Task 3</button>
+  <button class="w-[90%] bg-purple-500 hover:bg-purple-700 text-black font-bold py-2 px-4 rounded-full" onclick="buildTask4()">Task 4</button>
+  <button class="w-[90%] bg-green-500 hover:bg-green-700 text-black font-bold py-2 px-4 rounded-full" onclick="buildTask5()">Task 5</button>`;
+  taskbar.classList.remove(
+    "taskbar-task1",
+    "taskbar-task2",
+    "taskbar-task3",
+    "taskbar-task4",
+    "taskbar-task5",
+  );
+  taskbar.classList.add("taskbar-default");
 }
 
 function buildTask1() {
   taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 1</h3>
   <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
-  <button onclick="toggleMarker(marker)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Point</button>
-  <button onclick="toggleMarker(polygon)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Polygon</button>
-  <button onclick="toggleMarker(line)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Line</button>`;
+  <button onclick="toggleMarker()" class = "w-[90%] bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-full">Toggle Point</button>
+  <button onclick="togglePolygon()" class = "w-[90%] bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-full">Toggle Polygon</button>
+  <button onclick="toggleLine()" class = "w-[90%] bg-blue-500 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-full">Toggle Line</button>`;
+  map.flyTo([60.608289, 15.627966], 13);
+  taskbar.classList.remove("taskbar-default");
+  taskbar.classList.add("taskbar-task1");
 }
 function buildTask2() {
   taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline top-0">Task 2</h3>
   <button onClick="endTask2()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>`;
   task2Handler();
+
+  taskbar.classList.remove("taskbar-default");
+  taskbar.classList.add("taskbar-task2");
 }
 function endTask2() {
   document.getElementById("sidebar").classList.add("hidden");
@@ -323,21 +360,43 @@ function endTask2() {
   buildDefaultView();
 }
 function buildTask3() {
+  map.flyTo([59.803397, 17.569885], 9);
   taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 3</h3>
   <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
-  <button onclick="toggleSupermarkets()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Supermarkets</button>
-  <button onclick="toggleBuffer()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle 1km Buffer</button>
-  <button onclick="toggleOverlap()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Overlap</button>`;
+  <button onclick="toggleSupermarkets()" class = "w-[90%] bg-yellow-500 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded-full">Toggle Supermarkets</button>
+  <button onclick="toggleBuffer()" class = "w-[90%] bg-yellow-500 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded-full">Toggle 1km Buffer</button>
+  <button onclick="toggleOverlap()" class = "w-[90%] bg-yellow-500 hover:bg-yellow-700 text-black font-bold py-2 px-4 rounded-full">Toggle Overlap</button>`;
+  taskbar.classList.remove("taskbar-default");
+  taskbar.classList.add("taskbar-task3");
 }
 function buildTask4() {
+  map.flyTo([60.598283, 15.608976], 16);
   taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 4</h3>
   <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
-  <button onclick="toggleStaliteImage()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Image</button>`;
+  <button onclick="toggleStaliteImage()" class = "w-[90%] bg-purple-500 hover:bg-purple-700 text-black font-bold py-2 px-4 rounded-full">Toggle Image</button>`;
+  taskbar.classList.remove("taskbar-default");
+  taskbar.classList.add("taskbar-task4");
 }
 function buildTask5() {
+  map.flyTo([59.300536, 18.043851], 10);
   taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 5</h3>
   <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
-  <button onclick="toggleClusterGroup()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Marker Cluster</button>
-  <button onclick="toggleClusterGroup()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Donut Cluter</button>`;
+  <button onclick="toggleMarkerClusterGroup()" class = "w-[95%] bg-green-500 hover:bg-green-700 text-black font-bold py-2 px-4 rounded-full">Toggle Marker Cluster</button>
+  <button onclick="toggleClusterGroup()" class = "w-[95%] bg-green-500 hover:bg-green-700 text-black font-bold py-2 px-4 rounded-full">Toggle Donut Cluter</button>`;
+  taskbar.classList.remove("taskbar-default");
+  taskbar.classList.add("taskbar-task5");
 }
 buildDefaultView();
+
+function mapCordinatesOnClick(e) {
+  popupCords
+    .setLatLng(e.latlng)
+    .setContent(
+      "You clicked the map at " +
+        e.latlng.toString() +
+        "Current Zoom:" +
+        map.getZoom(),
+    )
+    .openOn(map);
+}
+map.on("click", mapCordinatesOnClick);

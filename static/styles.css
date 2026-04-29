@@ -1,0 +1,42 @@
+.taskbar-default {
+  background-color: rgb(170, 170, 170, 0.5);
+  border-color: black;
+  border-style: solid;
+  border-width: 2px;
+  border-style: double;
+}
+.taskbar-task1 {
+  background-color: rgba(88, 189, 236, 0.788);
+  border-color: rgb(0, 0, 0);
+  border-style: solid;
+  border-width: 2px;
+  border-style: double;
+}
+.taskbar-task2 {
+  background-color: rgba(255, 105, 105, 0.788);
+  border-color: rgb(0, 0, 0);
+  border-style: solid;
+  border-width: 2px;
+  border-style: double;
+}
+.taskbar-task3 {
+  background-color: rgba(255, 238, 0, 0.788);
+  border-color: rgb(0, 0, 0);
+  border-style: solid;
+  border-width: 2px;
+  border-style: double;
+}
+.taskbar-task4 {
+  background-color: rgba(207, 104, 255, 0.788);
+  border-color: rgb(0, 0, 0);
+  border-style: solid;
+  border-width: 2px;
+  border-style: double;
+}
+.taskbar-task5 {
+  background-color: rgba(92, 248, 131, 0.788);
+  border-color: rgb(0, 0, 0);
+  border-style: solid;
+  border-width: 2px;
+  border-style: double;
+}
