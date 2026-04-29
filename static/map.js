@@ -77,12 +77,10 @@ const task2Location = [
     img: "/static/tairyoFalun.jfif",
   },
 ];
-
+var markersPointOfIntresstArray = [];
 function markersPointOfIntresst() {
-  var markersPointOfIntresstArray = [];
   task2Location.forEach(function (location) {
     var marker = L.marker([location.lat, location.lng]);
-    console.log(document.getElementById("sidebar"));
     marker.on("click", function (e) {
       document.getElementById("sidebar").classList.remove("hidden");
       document.getElementById("sidebar").innerHTML =
@@ -94,15 +92,13 @@ function markersPointOfIntresst() {
     });
     markersPointOfIntresstArray.push(marker);
   });
-  return markersPointOfIntresstArray;
 }
 
-var markers = [];
 function task2Handler() {
-  if (markers.length == 0) {
-    markers = markersPointOfIntresst();
+  if (markersPointOfIntresstArray.length === 0) {
+    markersPointOfIntresst();
   }
-  markers.forEach(function (marker) {
+  markersPointOfIntresstArray.forEach(function (marker) {
     toggleMarker(marker);
   });
 }
@@ -110,93 +106,156 @@ function task2Handler() {
 // ---------------------------------------- Task 3 ---------------------------------------- //
 var supermarketCircles = [];
 var supermarketData = null;
-function toggleSupermarkets(data) {
-  if (supermarketData) {
-    L.geoJSON(data, {
-      onEachFeature: function (feature, layer) {
-        layer.bindPopup(feature.properties.name);
-      },
-    }).addTo(map);
-  }
-}
-function toggleBuffer(data) {
-  if (supermarketData) {
-    data.features.forEach(function (feature) {
-      // Storing each points lng/lat since they are reversed in the geoJSON compared to leaflet
-      var lng = feature.geometry.coordinates[0];
-      var lat = feature.geometry.coordinates[1];
-      // Adds 1km radius circle at each marker
-      var circle = L.circle([lat, lng], { radius: 1000 }).addTo(map);
-      supermarketCircles.push(circle);
-    });
-  }
-}
-function toggleOverlap(data) {
-  if (supermarketData) {
-    data.features.forEach(function (feature, index) {
-      var isOverlapping = false;
-      var lng1 = feature.geometry.coordinates[0];
-      var lat1 = feature.geometry.coordinates[1];
-      data.features.forEach(function (feature2) {
-        if (feature === feature2) {
-          return;
-        }
-        var lng2 = feature2.geometry.coordinates[0];
-        var lat2 = feature2.geometry.coordinates[1];
-
-        const distanceBetweenPoints = L.latLng(lat1, lng1).distanceTo(
-          L.latLng(lat2, lng2),
-        );
-        if (distanceBetweenPoints < 2000) {
-          isOverlapping = true;
-        }
-      });
-      if (isOverlapping) {
-        supermarketCircles[index].setStyle({ color: "red" });
-      } else {
-        supermarketCircles[index].setStyle({ color: "green" });
-      }
-    });
-  }
-}
+var supermarketLayer = null;
+var supermarketVisible = false;
+var buffersVisible = false;
+var overlapVisible = false;
 async function fetchGeoJsonData(path) {
   const response = await fetch(path);
   const data = await response.json();
   supermarketData = data;
+  addGeoJsonData(data);
 }
+function addGeoJsonData(data) {
+  if (supermarketData) {
+    supermarketLayer = L.geoJSON(data, {
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(feature.properties.name);
+      },
+    });
+  }
+}
+function toggleSupermarkets() {
+  if (supermarketLayer) {
+    toggleMarker(supermarketLayer);
+    supermarketVisible = !supermarketVisible;
+  }
+}
+function toggleBuffer() {
+  if (supermarketVisible && supermarketData) {
+    if (!buffersVisible) {
+      supermarketData.features.forEach(function (feature) {
+        // Storing each points lng/lat since they are reversed in the geoJSON compared to leaflet
+        var lng = feature.geometry.coordinates[0];
+        var lat = feature.geometry.coordinates[1];
+        // Adds 1km radius circle at each marker
+        var circle = L.circle([lat, lng], { radius: 1000 }).addTo(map);
+        supermarketCircles.push(circle);
+      });
+      buffersVisible = true;
+    } else {
+      supermarketCircles.forEach(function (circle) {
+        map.removeLayer(circle);
+      });
+      supermarketCircles = [];
+      buffersVisible = false;
+    }
+  }
+}
+function toggleOverlap() {
+  if (supermarketData && buffersVisible) {
+    if (!overlapVisible) {
+      supermarketData.features.forEach(function (feature, index) {
+        var isOverlapping = false;
+        var lng1 = feature.geometry.coordinates[0];
+        var lat1 = feature.geometry.coordinates[1];
+        supermarketData.features.forEach(function (feature2) {
+          if (feature === feature2) {
+            return;
+          }
+          var lng2 = feature2.geometry.coordinates[0];
+          var lat2 = feature2.geometry.coordinates[1];
+
+          const distanceBetweenPoints = L.latLng(lat1, lng1).distanceTo(
+            L.latLng(lat2, lng2),
+          );
+          if (distanceBetweenPoints < 2000) {
+            isOverlapping = true;
+          }
+        });
+        if (isOverlapping) {
+          supermarketCircles[index].setStyle({ color: "red" });
+        } else {
+          supermarketCircles[index].setStyle({ color: "green" });
+        }
+      });
+      overlapVisible = true;
+    } else {
+      supermarketCircles.forEach(function (circle) {
+        circle.setStyle({ color: "#3388ff" });
+      });
+      overlapVisible = false;
+    }
+  }
+}
+
 fetchGeoJsonData("/static/Data/supermarket.geojson");
 
 // ---------------------------------------- Task 4 ---------------------------------------- //
+imageVisible = false;
+var bounds = [
+  [60.59514843973514, 15.596187294878863],
+  [60.60181494883558, 15.619811791293525],
+];
+img = L.imageOverlay("/static/mineFalun.png", bounds);
+
 function toggleStaliteImage() {
-  var bounds = [
-    [60.59514843973514, 15.596187294878863],
-    [60.60181494883558, 15.619811791293525],
-  ];
-  L.imageOverlay("/static/mineFalun.png", bounds).addTo(map);
+  if (!imageVisible) {
+    img.addTo(map);
+    imageVisible = true;
+  } else {
+    map.removeLayer(img);
+    imageVisible = false;
+  }
 }
 
 // ---------------------------------------- Task 5 ---------------------------------------- //
 var fuelData = null;
+var clusterVisible = false;
 async function fetchFuelGeoJson(path) {
   const reponse = await fetch(path);
   const data = await reponse.json();
   fuelData = data;
 }
-
-function addMarkerClusterGroup(data) {
-  var markers = L.markerClusterGroup();
-  data.features.forEach(function (feature) {
-    var lng = feature.geometry.coordinates[0];
-    var lat = feature.geometry.coordinates[1];
-    var marker = L.marker([lat, lng]).bindPopup(feature.properties.name);
-    markers.addLayer(marker);
-  });
-  map.addLayer(markers);
+var markers = L.markerClusterGroup();
+function toggleMarkerClusterGroup() {
+  if (!clusterVisible) {
+    fuelData.features.forEach(function (feature) {
+      var lng = feature.geometry.coordinates[0];
+      var lat = feature.geometry.coordinates[1];
+      var marker = L.marker([lat, lng]).bindPopup(feature.properties.name);
+      markers.addLayer(marker);
+    });
+    clusterVisible = true;
+    map.addLayer(markers);
+  } else {
+    map.removeLayer(markers);
+    clusterVisible = false;
+    markers = L.markerClusterGroup();
+  }
 }
-fetchFuelGeoJson("/static/Data/fuel.geojson");
-
-function addDonutClusterGroup(data) {
-  var markers = L.DonutCluster(
+donutCluster = null;
+var donutVisible = false;
+function toggleClusterGroup() {
+  if (!donutVisible && donutCluster) {
+    fuelData.features.forEach(function (feature) {
+      var lng = feature.geometry.coordinates[0];
+      var lat = feature.geometry.coordinates[1];
+      var donutMarker = L.marker([lat, lng], {
+        brand: feature.properties.brand,
+      }).bindPopup(feature.properties.name);
+      donutCluster.addLayer(donutMarker);
+    });
+    map.addLayer(donutCluster);
+    donutVisible = true;
+  } else {
+    map.removeLayer(donutCluster);
+    donutVisible = false;
+    generateDonutCluster();
+  }
+}
+function generateDonutCluster() {
+  donutCluster = L.DonutCluster(
     { chunkedLoading: true },
     {
       key: "brand",
@@ -215,17 +274,10 @@ function addDonutClusterGroup(data) {
       },
     },
   );
-
-  data.features.forEach(function (feature) {
-    var lng = feature.geometry.coordinates[0];
-    var lat = feature.geometry.coordinates[1];
-    var marker = L.marker([lat, lng], {
-      brand: feature.properties.brand,
-    }).bindPopup(feature.properties.name);
-    markers.addLayer(marker);
-  });
-  map.addLayer(markers);
 }
+
+fetchFuelGeoJson("/static/Data/fuel.geojson");
+generateDonutCluster();
 // ---------------------------------------- HTML Buttons ---------------------------------------- //
 // Grabs our sidebar object
 var taskbar = document.getElementById("taskbar");
@@ -235,7 +287,6 @@ var sidebarImg = document.getElementById("sidebarImg");
 function toggleSidebar() {
   taskbar.classList.toggle("translate-x-full");
   taskbar.classList.toggle("translate-x-0");
-  //setTimeout(() => map.invalidateSize(), 300);
 }
 function toggleMarker(layer) {
   if (map.hasLayer(layer)) {
@@ -268,14 +319,15 @@ function buildTask2() {
 }
 function endTask2() {
   document.getElementById("sidebar").classList.add("hidden");
+  task2Handler();
   buildDefaultView();
 }
 function buildTask3() {
   taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 3</h3>
   <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
-  <button onclick="toggleSupermarkets(supermarketData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Supermarkets</button>
-  <button onclick="toogleBuffer(supermarketData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle 1km Buffer</button>
-  <button onclick="toogleOverlap(supermarketData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Overlap</button>`;
+  <button onclick="toggleSupermarkets()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Supermarkets</button>
+  <button onclick="toggleBuffer()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle 1km Buffer</button>
+  <button onclick="toggleOverlap()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Overlap</button>`;
 }
 function buildTask4() {
   taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 4</h3>
@@ -285,7 +337,7 @@ function buildTask4() {
 function buildTask5() {
   taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 5</h3>
   <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
-  <button onclick="addMarkerClusterGroup(fuelData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Marker Cluster</button>
-  <button onclick="addDonutClusterGroup(fuelData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Donut Cluter</button>`;
+  <button onclick="toggleClusterGroup()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Marker Cluster</button>
+  <button onclick="toggleClusterGroup()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Donut Cluter</button>`;
 }
 buildDefaultView();
