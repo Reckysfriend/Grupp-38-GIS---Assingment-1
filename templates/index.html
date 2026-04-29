@@ -34,66 +34,10 @@
     <div>
       <div class="h-screen w-screen" id="map"></div>
       <div
-        class="translate-x-full transition-transform duration-300 flex flex-col gap-4 p-4 items-center bg-gray-300 z-[1000] fixed top-0 right-0 h-full w-64"
-        id="sidebar"
-      >
-        <button
-          class="absolute -left-8 top-1/2 z-[2000]"
-          onClick="toggleSidebar()"
-        >
-          <img
-            id="sidebarImg"
-            src="{{ url_for('static', filename='show-sidepanel.png') }}"
-          />
-        </button>
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-          onclick="toggleMarker(polygon)"
-        >
-          Toggle Polygon
-        </button>
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-          onclick="toggleMarker(marker)"
-        >
-          Toggle Marker
-        </button>
-        <button
-          class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-          onclick="toggleMarker(line)"
-        >
-          Toggle Line
-        </button>
-        <button
-          class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full"
-          onclick="togglePopup()"
-          id="popupButton"
-        >
-          Toggle Popup
-        </button>
-        <button
-          class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full"
-          onclick="task2Handler()"
-          id="popupButton"
-        >
-          Task 2
-        </button>
-        <button
-          class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full"
-          onclick="locationSidebar()"
-          id="popupButton"
-        >
-          Sidebar Test
-        </button>
-      </div>
-      <div
-        id="markerSidebar"
-        class="items-center bg-gray-300 z-[2000] fixed top-0 left-0 h-full w-64"
-        onClick=""
-      >
-        <p>Task 2</p>
-      </div>
-    </div>
+        class="translate-x-full transition-transform duration-300 flex flex-col gap-4 p-4 items-center bg-gray-300 z-[1000] fixed top-0 right-0 w-64 h-72"
+        id="taskbar"></div>
+      <div id="sidebar" class="hidden items-center bg-gray-300 z-[2000] fixed  left-0 h-50 w-64"></div>
+
 
     <script src="{{ url_for('static', filename='map.js') }}"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>

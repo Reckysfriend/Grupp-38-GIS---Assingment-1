@@ -1,4 +1,5 @@
-// Adds the map from openStreeMap
+// ---------------------------------------- Builds Map ---------------------------------------- //
+
 var map = L.map("map").setView([60.61713023811373, 15.597447894438337], 13);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -7,18 +8,10 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 }).addTo(map);
 
-// Basic set of marker, circle and polygon
+// ---------------------------------------- Task 1 ---------------------------------------- //
 var marker = L.marker([60.61713023811373, 15.597447894438337]).bindPopup(
   `<h1> Ringvägen</h1><p> Linus' childhood neighbourhood </p><img src="/static/markerImg.jpg" width="500">`,
 );
-
-var circle = L.circle([60.61713023811373, 15.597447894438337], {
-  color: "blue",
-  fillColor: "#f03",
-  fillOpacity: 0.5,
-  radius: 200,
-});
-
 var polygon = L.polygon([
   [60.60066683717627, 15.630680520852824],
   [60.61713023811373, 15.597447894438337],
@@ -36,52 +29,7 @@ var line = L.polygon([
 );
 var popupCords = L.popup();
 
-function toggleMarker(layer) {
-  if (map.hasLayer(layer)) {
-    map.removeLayer(layer);
-  } else {
-    map.addLayer(layer);
-  }
-}
-
-// Function to return cordinate data on map click
-function mapCordinatesOnClick(e) {
-  popupCords
-    .setLatLng(e.latlng)
-    .setContent("You clicked the map at " + e.latlng.toString())
-    .openOn(map);
-}
-
-// Grabs our sidebar object
-var sidebar = document.getElementById("sidebar");
-//var varMap = document.getElementById("map");
-var sidebarImg = document.getElementById("sidebarImg");
-
-function toggleSidebar() {
-  sidebar.classList.toggle("translate-x-full");
-  sidebar.classList.toggle("translate-x-0");
-  //setTimeout(() => map.invalidateSize(), 300);
-}
-var popupEnabled = false;
-var popupButton = document.getElementById("popupButton");
-
-function togglePopup() {
-  if (popupEnabled) {
-    map.off("click", mapCordinatesOnClick);
-    popupEnabled = false;
-  } else {
-    map.on("click", mapCordinatesOnClick);
-    popupEnabled = true;
-  }
-  popupButton.classList.toggle("bg-green-500");
-}
-
-function locationSidebar() {
-  const markerSidebarElement = document.querySelector("#markerSidebar");
-  const content = "<p> Updated Test </>";
-  markerSidebarElement.innerHTML = content;
-}
-
+// ---------------------------------------- Task 2 ---------------------------------------- //
 const task2Location = [
   {
     name: "Max Burgers",
@@ -132,16 +80,17 @@ const task2Location = [
 
 function markersPointOfIntresst() {
   var markersPointOfIntresstArray = [];
-  task2Location.forEach(function (t2location) {
-    var marker = L.marker([t2location.lat, t2location.lng]);
-
+  task2Location.forEach(function (location) {
+    var marker = L.marker([location.lat, location.lng]);
+    console.log(document.getElementById("sidebar"));
     marker.on("click", function (e) {
-      document.getElementById("markerSidebar").innerHTML =
-        `<img src =${t2location.img} width="300" height="200">
-      <h3>${t2location.name}</h3>
-      <p>${t2location.type}</p>
-      <p>${t2location.location}</p>
-      <p>${t2location.description}</p>`;
+      document.getElementById("sidebar").classList.remove("hidden");
+      document.getElementById("sidebar").innerHTML =
+        `<img src =${location.img} width="300" height="200">
+      <h3>${location.name}</h3>
+      <p>${location.type}</p>
+      <p>${location.location}</p>
+      <p>${location.description}</p>`;
     });
     markersPointOfIntresstArray.push(marker);
   });
@@ -160,75 +109,78 @@ function task2Handler() {
 
 // ---------------------------------------- Task 3 ---------------------------------------- //
 var supermarketCircles = [];
-
-function addGeoJsonData(data) {
-  L.geoJSON(data, {
-    onEachFeature: function (feature, layer) {
-      layer.bindPopup(feature.properties.name);
-    },
-  }).addTo(map);
+var supermarketData = null;
+function toggleSupermarkets(data) {
+  if (supermarketData) {
+    L.geoJSON(data, {
+      onEachFeature: function (feature, layer) {
+        layer.bindPopup(feature.properties.name);
+      },
+    }).addTo(map);
+  }
 }
-function addBuffer(data) {
-  data.features.forEach(function (feature) {
-    // Storing each points lng/lat since they are reversed in the geoJSON compared to leaflet
-    var lng = feature.geometry.coordinates[0];
-    var lat = feature.geometry.coordinates[1];
-    // Adds 1km radius circle at each marker
-    var circle = L.circle([lat, lng], { radius: 1000 }).addTo(map);
-    supermarketCircles.push(circle);
-  });
+function toggleBuffer(data) {
+  if (supermarketData) {
+    data.features.forEach(function (feature) {
+      // Storing each points lng/lat since they are reversed in the geoJSON compared to leaflet
+      var lng = feature.geometry.coordinates[0];
+      var lat = feature.geometry.coordinates[1];
+      // Adds 1km radius circle at each marker
+      var circle = L.circle([lat, lng], { radius: 1000 }).addTo(map);
+      supermarketCircles.push(circle);
+    });
+  }
 }
-function checkBufferOverlap(data) {
-  data.features.forEach(function (feature, index) {
-    var isOverlapping = false;
-    var lng1 = feature.geometry.coordinates[0];
-    var lat1 = feature.geometry.coordinates[1];
-    data.features.forEach(function (feature2) {
-      if (feature === feature2) {
-        return;
-      }
-      var lng2 = feature2.geometry.coordinates[0];
-      var lat2 = feature2.geometry.coordinates[1];
+function toggleOverlap(data) {
+  if (supermarketData) {
+    data.features.forEach(function (feature, index) {
+      var isOverlapping = false;
+      var lng1 = feature.geometry.coordinates[0];
+      var lat1 = feature.geometry.coordinates[1];
+      data.features.forEach(function (feature2) {
+        if (feature === feature2) {
+          return;
+        }
+        var lng2 = feature2.geometry.coordinates[0];
+        var lat2 = feature2.geometry.coordinates[1];
 
-      const distanceBetweenPoints = L.latLng(lat1, lng1).distanceTo(
-        L.latLng(lat2, lng2),
-      );
-      if (distanceBetweenPoints < 2000) {
-        isOverlapping = true;
+        const distanceBetweenPoints = L.latLng(lat1, lng1).distanceTo(
+          L.latLng(lat2, lng2),
+        );
+        if (distanceBetweenPoints < 2000) {
+          isOverlapping = true;
+        }
+      });
+      if (isOverlapping) {
+        supermarketCircles[index].setStyle({ color: "red" });
+      } else {
+        supermarketCircles[index].setStyle({ color: "green" });
       }
     });
-    if (isOverlapping) {
-      supermarketCircles[index].setStyle({ color: "red" });
-    } else {
-      supermarketCircles[index].setStyle({ color: "green" });
-    }
-  });
+  }
 }
 async function fetchGeoJsonData(path) {
   const response = await fetch(path);
   const data = await response.json();
-  //console.log(data);
-  addGeoJsonData(data);
-  addBuffer(data);
-  checkBufferOverlap(data);
+  supermarketData = data;
 }
 fetchGeoJsonData("/static/Data/supermarket.geojson");
 
 // ---------------------------------------- Task 4 ---------------------------------------- //
-
-var bounds = [
-  [60.59514843973514, 15.596187294878863],
-  [60.60181494883558, 15.619811791293525],
-];
-L.imageOverlay("/static/mineFalun.png", bounds).addTo(map);
+function toggleStaliteImage() {
+  var bounds = [
+    [60.59514843973514, 15.596187294878863],
+    [60.60181494883558, 15.619811791293525],
+  ];
+  L.imageOverlay("/static/mineFalun.png", bounds).addTo(map);
+}
 
 // ---------------------------------------- Task 5 ---------------------------------------- //
-
+var fuelData = null;
 async function fetchFuelGeoJson(path) {
   const reponse = await fetch(path);
   const data = await reponse.json();
-  //addMarkerClusterGroup(data);
-  addDonutClusterGroup(data);
+  fuelData = data;
 }
 
 function addMarkerClusterGroup(data) {
@@ -244,7 +196,6 @@ function addMarkerClusterGroup(data) {
 fetchFuelGeoJson("/static/Data/fuel.geojson");
 
 function addDonutClusterGroup(data) {
-  console.log(data);
   var markers = L.DonutCluster(
     { chunkedLoading: true },
     {
@@ -275,3 +226,66 @@ function addDonutClusterGroup(data) {
   });
   map.addLayer(markers);
 }
+// ---------------------------------------- HTML Buttons ---------------------------------------- //
+// Grabs our sidebar object
+var taskbar = document.getElementById("taskbar");
+//var varMap = document.getElementById("map");
+var sidebarImg = document.getElementById("sidebarImg");
+
+function toggleSidebar() {
+  taskbar.classList.toggle("translate-x-full");
+  taskbar.classList.toggle("translate-x-0");
+  //setTimeout(() => map.invalidateSize(), 300);
+}
+function toggleMarker(layer) {
+  if (map.hasLayer(layer)) {
+    map.removeLayer(layer);
+  } else {
+    map.addLayer(layer);
+  }
+}
+function buildDefaultView() {
+  taskbar.innerHTML = `        
+  <button class="absolute -left-8 top-1/2 z-[2000]" onClick="toggleSidebar()"><img id="sidebarImg" src="/static/hide-sidepanel.png"/></button>
+  <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask1()">Task 1</button>
+  <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask2()">Task 2</button>
+  <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask3()">Task 3</button>
+  <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask4()">Task 4</button>
+  <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full" onclick="buildTask5()">Task 5</button>`;
+}
+
+function buildTask1() {
+  taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 1</h3>
+  <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
+  <button onclick="toggleMarker(marker)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Point</button>
+  <button onclick="toggleMarker(polygon)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Polygon</button>
+  <button onclick="toggleMarker(line)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Line</button>`;
+}
+function buildTask2() {
+  taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline top-0">Task 2</h3>
+  <button onClick="endTask2()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>`;
+  task2Handler();
+}
+function endTask2() {
+  document.getElementById("sidebar").classList.add("hidden");
+  buildDefaultView();
+}
+function buildTask3() {
+  taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 3</h3>
+  <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
+  <button onclick="toggleSupermarkets(supermarketData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Supermarkets</button>
+  <button onclick="toogleBuffer(supermarketData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle 1km Buffer</button>
+  <button onclick="toogleOverlap(supermarketData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Overlap</button>`;
+}
+function buildTask4() {
+  taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 4</h3>
+  <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
+  <button onclick="toggleStaliteImage()" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Image</button>`;
+}
+function buildTask5() {
+  taskbar.innerHTML = `<h3 class = "text-center decoration-double font-bold underline">Task 5</h3>
+  <button onClick="buildDefaultView()" class = "absolute left-0 top-0 z-[2000] rotate-180"><img src="/static/backArrow.png"/></button>
+  <button onclick="addMarkerClusterGroup(fuelData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Marker Cluster</button>
+  <button onclick="addDonutClusterGroup(fuelData)" class = "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Toggle Donut Cluter</button>`;
+}
+buildDefaultView();
