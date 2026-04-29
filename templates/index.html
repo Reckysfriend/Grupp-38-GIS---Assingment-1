@@ -20,6 +20,14 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body>
@@ -88,5 +96,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='map.js') }}"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script src="{{ url_for('static', filename='Leaflet.DonutCluster.js') }}"></script>
   </body>
 </html>

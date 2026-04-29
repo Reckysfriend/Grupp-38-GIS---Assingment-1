@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@kalisio/leaflet.donutcluster": "^1.1.0",
+    "leaflet.markercluster": "^1.5.3"
+  }
+}

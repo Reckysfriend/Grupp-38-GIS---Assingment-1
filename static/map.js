@@ -223,3 +223,55 @@ var bounds = [
 L.imageOverlay("/static/mineFalun.png", bounds).addTo(map);
 
 // ---------------------------------------- Task 5 ---------------------------------------- //
+
+async function fetchFuelGeoJson(path) {
+  const reponse = await fetch(path);
+  const data = await reponse.json();
+  //addMarkerClusterGroup(data);
+  addDonutClusterGroup(data);
+}
+
+function addMarkerClusterGroup(data) {
+  var markers = L.markerClusterGroup();
+  data.features.forEach(function (feature) {
+    var lng = feature.geometry.coordinates[0];
+    var lat = feature.geometry.coordinates[1];
+    var marker = L.marker([lat, lng]).bindPopup(feature.properties.name);
+    markers.addLayer(marker);
+  });
+  map.addLayer(markers);
+}
+fetchFuelGeoJson("/static/Data/fuel.geojson");
+
+function addDonutClusterGroup(data) {
+  console.log(data);
+  var markers = L.DonutCluster(
+    { chunkedLoading: true },
+    {
+      key: "brand",
+      arcColorDict: {
+        Shell: "yellow",
+        OKQ8: "green",
+        "Circle K": "orange",
+        undefined: "gray",
+        st1: "blue",
+        ST1: "blue",
+        St1: "blue",
+        IDS: "purple",
+        Preem: "red",
+        Ingo: "indigo",
+        Tanka: "black",
+      },
+    },
+  );
+
+  data.features.forEach(function (feature) {
+    var lng = feature.geometry.coordinates[0];
+    var lat = feature.geometry.coordinates[1];
+    var marker = L.marker([lat, lng], {
+      brand: feature.properties.brand,
+    }).bindPopup(feature.properties.name);
+    markers.addLayer(marker);
+  });
+  map.addLayer(markers);
+}
