@@ -159,3 +159,57 @@ function task2Handler() {
 }
 
 // ---------------------------------------- Task 3 ---------------------------------------- //
+var supermarketCircles = [];
+
+function addGeoJsonData(data) {
+  L.geoJSON(data, {
+    onEachFeature: function (feature, layer) {
+      layer.bindPopup(feature.properties.name);
+    },
+  }).addTo(map);
+}
+function addBuffer(data) {
+  data.features.forEach(function (feature) {
+    // Storing each points lng/lat since they are reversed in the geoJSON compared to leaflet
+    var lng = feature.geometry.coordinates[0];
+    var lat = feature.geometry.coordinates[1];
+    // Adds 1km radius circle at each marker
+    var circle = L.circle([lat, lng], { radius: 1000 }).addTo(map);
+    supermarketCircles.push(circle);
+  });
+}
+function checkBufferOverlap(data) {
+  data.features.forEach(function (feature, index) {
+    var isOverlapping = false;
+    var lng1 = feature.geometry.coordinates[0];
+    var lat1 = feature.geometry.coordinates[1];
+    data.features.forEach(function (feature2) {
+      if (feature === feature2) {
+        return;
+      }
+      var lng2 = feature2.geometry.coordinates[0];
+      var lat2 = feature2.geometry.coordinates[1];
+
+      const distanceBetweenPoints = L.latLng(lat1, lng1).distanceTo(
+        L.latLng(lat2, lng2),
+      );
+      if (distanceBetweenPoints < 2000) {
+        isOverlapping = true;
+      }
+    });
+    if (isOverlapping) {
+      supermarketCircles[index].setStyle({ color: "red" });
+    } else {
+      supermarketCircles[index].setStyle({ color: "green" });
+    }
+  });
+}
+async function fetchGeoJsonData(path) {
+  const response = await fetch(path);
+  const data = await response.json();
+  //console.log(data);
+  addGeoJsonData(data);
+  addBuffer(data);
+  checkBufferOverlap(data);
+}
+fetchGeoJsonData("/static/Data/supermarket.geojson");
