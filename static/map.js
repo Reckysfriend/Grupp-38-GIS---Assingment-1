@@ -130,15 +130,32 @@ const task2Location = [
   },
 ];
 
-task2Location.forEach(function (t2location) {
-  var marker = L.marker([t2location.lat, t2location.lng]).addTo(map);
+function markersPointOfIntresst() {
+  var markersPointOfIntresstArray = [];
+  task2Location.forEach(function (t2location) {
+    var marker = L.marker([t2location.lat, t2location.lng]);
 
-  marker.on("click", function (e) {
-    document.getElementById("markerSidebar").innerHTML =
-      `<img src =${t2location.img} width="300" height="200">
+    marker.on("click", function (e) {
+      document.getElementById("markerSidebar").innerHTML =
+        `<img src =${t2location.img} width="300" height="200">
       <h3>${t2location.name}</h3>
       <p>${t2location.type}</p>
       <p>${t2location.location}</p>
       <p>${t2location.description}</p>`;
+    });
+    markersPointOfIntresstArray.push(marker);
   });
-});
+  return markersPointOfIntresstArray;
+}
+
+var markers = [];
+function task2Handler() {
+  if (markers.length == 0) {
+    markers = markersPointOfIntresst();
+  }
+  markers.forEach(function (marker) {
+    toggleMarker(marker);
+  });
+}
+
+// ---------------------------------------- Task 3 ---------------------------------------- //
