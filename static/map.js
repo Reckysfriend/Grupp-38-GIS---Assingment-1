@@ -213,3 +213,13 @@ async function fetchGeoJsonData(path) {
   checkBufferOverlap(data);
 }
 fetchGeoJsonData("/static/Data/supermarket.geojson");
+
+// ---------------------------------------- Task 4 ---------------------------------------- //
+
+var bounds = [
+  [60.59514843973514, 15.596187294878863],
+  [60.60181494883558, 15.619811791293525],
+];
+L.imageOverlay("/static/mineFalun.png", bounds).addTo(map);
+
+// ---------------------------------------- Task 5 ---------------------------------------- //
