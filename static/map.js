@@ -1,5 +1,5 @@
 // ---------------------------------------- Builds Map ---------------------------------------- //
-
+//Adds the map to our div element via openstreetmap
 var map = L.map("map").setView([62.226996, 16.21582], 5);
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -9,9 +9,11 @@ L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
 }).addTo(map);
 
 // ---------------------------------------- Task 1 ---------------------------------------- //
+//Places a marker at given cordinates with popup
 var marker = L.marker([60.61713023811373, 15.597447894438337]).bindPopup(
   `<h1> Ringvägen</h1><p> Linus' childhood neighbourhood </p><img src="/static/markerImg.jpg" width="500">`,
 );
+//Places a polygon at given cordinates with popup
 var polygon = L.polygon([
   [60.60066683717627, 15.630680520852824],
   [60.61713023811373, 15.597447894438337],
@@ -20,12 +22,14 @@ var polygon = L.polygon([
 ]).bindPopup(
   `<h1>Houses in Falun</h1><p> Each location Linus has lived in Falun </p><img src="/static/falunAir.jpg" width="500">`,
 );
+//Places a line at given cordinates with popup
 var line = L.polygon([
   [60.606425, 15.629591],
   [60.604342, 15.64179],
 ]).bindPopup(
   `<h1>Line between the bar and Max</h1><img src="/static/maxFalun.jpg" width="500">`,
 );
+// Uses toggleLayer to check if the layer already exsists or not before adding/removing it
 function toggleMarker() {
   map.flyTo([60.616944, 15.597239], 16);
   toggleLayer(marker);
@@ -42,6 +46,7 @@ function toggleLine() {
 var popupCords = L.popup();
 
 // ---------------------------------------- Task 2 ---------------------------------------- //
+//Location data to be maped during task 2
 const task2Location = [
   {
     name: "Max Burgers",
@@ -94,6 +99,7 @@ const task2Location = [
     img: "/static/tairyoFalun.jfif",
   },
 ];
+//Places markers based on task2Location array and adds relevant information to the markers
 var markersPointOfIntresstArray = [];
 function markersPointOfIntresst() {
   task2Location.forEach(function (location) {
@@ -111,7 +117,7 @@ function markersPointOfIntresst() {
     markersPointOfIntresstArray.push(marker);
   });
 }
-
+// Assist function for handling task2 to avoid repreated generation of array
 function task2Handler() {
   map.flyTo([60.607404, 15.645368], 16);
   if (markersPointOfIntresstArray.length === 0) {
@@ -129,12 +135,15 @@ var supermarketLayer = null;
 var supermarketVisible = false;
 var buffersVisible = false;
 var overlapVisible = false;
+
+// Fetches the provided geojsondata and converts it to json for easier handling
 async function fetchGeoJsonData(path) {
   const response = await fetch(path);
   const data = await response.json();
   supermarketData = data;
   addGeoJsonData(data);
 }
+// Makes the geojsondata avalible to other functions and adds name popup
 function addGeoJsonData(data) {
   if (supermarketData) {
     supermarketLayer = L.geoJSON(data, {
@@ -144,6 +153,7 @@ function addGeoJsonData(data) {
     });
   }
 }
+// Toggles on each supermarket marker
 function toggleSupermarkets() {
   map.flyTo([59.803397, 17.569885], 9);
   if (supermarketLayer) {
@@ -151,6 +161,7 @@ function toggleSupermarkets() {
     supermarketVisible = !supermarketVisible;
   }
 }
+// Toggles the 1km buffer radius on if the supermarket markers are visible
 function toggleBuffer() {
   map.flyTo([59.626103, 17.15395], 13);
   if (supermarketVisible && supermarketData) {
@@ -173,6 +184,7 @@ function toggleBuffer() {
     }
   }
 }
+//Changes the color of the circles based on if the distance between points is greater than 2km
 function toggleOverlap() {
   if (supermarketData && buffersVisible) {
     if (!overlapVisible) {
@@ -214,12 +226,13 @@ fetchGeoJsonData("/static/Data/supermarket.geojson");
 
 // ---------------------------------------- Task 4 ---------------------------------------- //
 imageVisible = false;
+//Bounds for image. Hand picked from googlemaps
 var bounds = [
   [60.59514843973514, 15.596187294878863],
   [60.60181494883558, 15.619811791293525],
 ];
 img = L.imageOverlay("/static/mineFalun.png", bounds);
-
+// Loads/unloads the image based on state
 function toggleStaliteImage() {
   if (!imageVisible) {
     img.addTo(map);
@@ -233,12 +246,15 @@ function toggleStaliteImage() {
 // ---------------------------------------- Task 5 ---------------------------------------- //
 var fuelData = null;
 var clusterVisible = false;
+// Fetches the fuelgeojson and makes it avalible to other functions
 async function fetchFuelGeoJson(path) {
   const reponse = await fetch(path);
   const data = await reponse.json();
   fuelData = data;
 }
+//Empty markerClusterGroup
 var markers = L.markerClusterGroup();
+//Adds clustergroups based on provided markers
 function toggleMarkerClusterGroup() {
   map.flyTo([59.300536, 18.043851], 10);
   if (!clusterVisible) {
@@ -258,6 +274,7 @@ function toggleMarkerClusterGroup() {
 }
 donutCluster = null;
 var donutVisible = false;
+//Adds donutclusters based on provided markers with "Brand" as key
 function toggleClusterGroup() {
   map.flyTo([59.300536, 18.043851], 10);
   if (!donutVisible && donutCluster) {
@@ -274,9 +291,11 @@ function toggleClusterGroup() {
   } else {
     map.removeLayer(donutCluster);
     donutVisible = false;
+    //Generates DonutCluster based on pregiven parameters
     generateDonutCluster();
   }
 }
+// Generates "empty" donutcluster based on provided information
 function generateDonutCluster() {
   donutCluster = L.DonutCluster(
     { chunkedLoading: true },
@@ -306,11 +325,12 @@ generateDonutCluster();
 var taskbar = document.getElementById("taskbar");
 //var varMap = document.getElementById("map");
 var sidebarImg = document.getElementById("sidebarImg");
-
+//Smooth transiation for sidebar
 function toggleSidebar() {
   taskbar.classList.toggle("translate-x-full");
   taskbar.classList.toggle("translate-x-0");
 }
+// Removes/Adds a layer based on current state
 function toggleLayer(layer) {
   if (map.hasLayer(layer)) {
     map.removeLayer(layer);
@@ -318,6 +338,7 @@ function toggleLayer(layer) {
     map.addLayer(layer);
   }
 }
+//Builds all the different HTML elements for each task
 function buildDefaultView() {
   taskbar.innerHTML = `        
   <button class="absolute -left-5 top-0 z-[2000]" onClick="toggleSidebar()"><img id="sidebarImg" src="/static/hide-sidepanel.png"/></button>
@@ -388,6 +409,7 @@ function buildTask5() {
 }
 buildDefaultView();
 
+// Helper function to provide cordinates and zoom levels for "flyTo" functions
 function mapCordinatesOnClick(e) {
   popupCords
     .setLatLng(e.latlng)
